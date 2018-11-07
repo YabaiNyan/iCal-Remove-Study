@@ -6,6 +6,7 @@ if (process.argv.length < 3) {
 
 // Read the file
 var fs = require('fs');
+var path = require("path");
 var filename = process.argv[2];
 
 fs.readFile(filename, 'utf8', function (err, data) {
@@ -18,7 +19,7 @@ fs.readFile(filename, 'utf8', function (err, data) {
     var newpush = "";
     var eventarr = [];
     lines.forEach(element => {
-        if (element == "END:VEVENT") {
+        if (element.startsWith("END:")) {
                 newpush += element + "\r\n"
                 eventarr.push(newpush)
                 newpush = "";
@@ -26,6 +27,8 @@ fs.readFile(filename, 'utf8', function (err, data) {
             newpush += element + "\r\n"
         }
     });
+
+    console.log(eventarr)
 
     //make all elements that have "study" empty
     for (i = 0; i < eventarr.length; i++) { 
@@ -36,16 +39,17 @@ fs.readFile(filename, 'utf8', function (err, data) {
 
     //add to start and end extra info that was removed.
     eventarr.unshift("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n")
-    eventarr.push("END:VCALENDAR")
 
     //create a singular string to be written to a file
     var outputfile = eventarr.join("")
 
 
     //get file name (This is a mess I know)
-    var filenamearr = filename.split("\\")
-    var filenamewithoutanydir = filenamearr[filenamearr.length - 1].split(".")[0];
-    var actualfilename = filenamewithoutanydir.substring(0, filename.length - 4) + "_no_study.ics"
+    var filenamearr = filename.split(path.sep);
+    var filenamewithoutanydir = filenamearr[filenamearr.length - 1].split(".");
+    filenamewithoutanydir.pop();
+    filenamewithoutanydir.join(".");
+    var actualfilename = filenamewithoutanydir + "_no_study.ics"
 
     //save file.
     fs.writeFile(__dirname + "/" + actualfilename, outputfile, function (err) {
