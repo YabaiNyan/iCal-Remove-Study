@@ -12,3 +12,7 @@ First download the files from the this git repository by cloning or otherwise. <
 Then open a command line in the root folder and run </br>
 ```node index.js "<directory to ics file>"``` </br>
 The result will be output to the directory where the script exists in with the \<filename\>_no_study.ics
+
+## Todo
+-Convert the script to be usable as HTML.
+-Convert to Electron application. (not really practical but for practice)
