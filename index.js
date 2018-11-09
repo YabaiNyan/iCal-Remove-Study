@@ -18,31 +18,30 @@ fs.readFile(filename, 'utf8', function (err, data) {
     //split data by event
     var newpush = "";
     var eventarr = [];
+    var firstp = false;
     lines.forEach(element => {
         if (element.startsWith("END:")) {
-                newpush += element + "\r\n"
-                eventarr.push(newpush)
-                newpush = "";
-        } else {
+            newpush += element + "\r\n"
+            eventarr.push(newpush)
+            newpush = "";
+        } else if (element.startsWith("BEGIN:") && newpush != ""){
+            eventarr.push(newpush)
+            newpush = "";
+            newpush += element + "\r\n"
+        }else {
             newpush += element + "\r\n"
         }
     });
 
     console.log(eventarr)
 
-    //make all elements that have "study" empty
-    for (i = 0; i < eventarr.length; i++) { 
-        if(eventarr[i].includes("Study")){
-            eventarr[i] = "";
-        }
+    //add to start and end extra info that was removed. (only if it is though)
+    if(!eventarr[0].startsWith("BEGIN:VCALENDAR")){
+        eventarr.unshift("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n")
     }
-
-    //add to start and end extra info that was removed.
-    eventarr.unshift("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n")
-
+    
     //create a singular string to be written to a file
     var outputfile = eventarr.join("")
-
 
     //get file name (This is a mess I know)
     var filenamearr = filename.split(path.sep);
